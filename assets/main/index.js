@@ -420,17 +420,20 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
 });
 
 System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc'], function (exports) {
-  var _applyDecoratedDescriptor, _inheritsLoose, _initializerDefineProperty, _assertThisInitialized, cclegacy, _decorator, Button, Component;
+  var _applyDecoratedDescriptor, _inheritsLoose, _initializerDefineProperty, _assertThisInitialized, _asyncToGenerator, _regeneratorRuntime, cclegacy, _decorator, Button, Label, Component;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
       _inheritsLoose = module.inheritsLoose;
       _initializerDefineProperty = module.initializerDefineProperty;
       _assertThisInitialized = module.assertThisInitialized;
+      _asyncToGenerator = module.asyncToGenerator;
+      _regeneratorRuntime = module.regeneratorRuntime;
     }, function (module) {
       cclegacy = module.cclegacy;
       _decorator = module._decorator;
       Button = module.Button;
+      Label = module.Label;
       Component = module.Component;
     }],
     execute: function () {
@@ -447,6 +450,9 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           }
           _this = _Component.call.apply(_Component, [this].concat(args)) || this;
           _initializerDefineProperty(_this, "btnVoiceInput", _descriptor, _assertThisInitialized(_this));
+          _this.isRecording = false;
+          _this.mediaRecorder = null;
+          _this.audioChunks = [];
           return _this;
         }
         var _proto = Voiceinput.prototype;
@@ -454,9 +460,95 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           if (this.btnVoiceInput) {
             this.btnVoiceInput.node.on(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
           }
+          this.UpdateButtonState();
         };
-        _proto.OnVoiceButtonPressed = function OnVoiceButtonPressed() {
-          console.log('pressed');
+        _proto.OnVoiceButtonPressed = /*#__PURE__*/function () {
+          var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+            var _this2 = this;
+            var stream, _this$mediaRecorder;
+            return _regeneratorRuntime().wrap(function _callee$(_context) {
+              while (1) switch (_context.prev = _context.next) {
+                case 0:
+                  if (this.isRecording) {
+                    _context.next = 21;
+                    break;
+                  }
+                  console.log('Start recording...');
+                  _context.prev = 2;
+                  _context.next = 5;
+                  return navigator.mediaDevices.getUserMedia({
+                    audio: true
+                  });
+                case 5:
+                  stream = _context.sent;
+                  console.log("Got audio");
+                  this.audioChunks = [];
+                  this.mediaRecorder = new MediaRecorder(stream);
+                  this.mediaRecorder.ondataavailable = function (event) {
+                    if (event.data.size > 0) {
+                      _this2.audioChunks.push(event.data);
+                    }
+                  };
+
+                  // assign on stop recording
+                  this.mediaRecorder.onstop = function () {
+                    var blob = new Blob(_this2.audioChunks, {
+                      type: 'audio/webm'
+                    });
+                    var url = URL.createObjectURL(blob);
+                    console.log('Recording stopped. Audio blob URL:', url);
+
+                    // Try to play audio:
+                    var audio = new Audio(url);
+                    audio.play();
+                    // Or send this blob to Telegram WebApp server in the future
+                  };
+
+                  this.mediaRecorder.start();
+                  this.isRecording = true;
+                  this.UpdateButtonState();
+                  _context.next = 19;
+                  break;
+                case 16:
+                  _context.prev = 16;
+                  _context.t0 = _context["catch"](2);
+                  console.error('CAN NOT ACCESS MICRO:', _context.t0);
+                case 19:
+                  _context.next = 26;
+                  break;
+                case 21:
+                  // press the second time -> stop recording
+                  console.log('Stop recording.');
+                  (_this$mediaRecorder = this.mediaRecorder) == null || _this$mediaRecorder.stop();
+                  this.mediaRecorder = null;
+                  this.isRecording = false;
+                  this.UpdateButtonState();
+                case 26:
+                case "end":
+                  return _context.stop();
+              }
+            }, _callee, this, [[2, 16]]);
+          }));
+          function OnVoiceButtonPressed() {
+            return _OnVoiceButtonPressed.apply(this, arguments);
+          }
+          return OnVoiceButtonPressed;
+        }();
+        _proto.UpdateButtonState = function UpdateButtonState() {
+          if (this.btnVoiceInput) {
+            var label = this.btnVoiceInput.getComponentInChildren(Label);
+            if (label) {
+              label.string = this.isRecording ? 'Stop' : 'Start';
+            }
+          }
+        };
+        _proto.onDestroy = function onDestroy() {
+          if (this.btnVoiceInput) {
+            this.btnVoiceInput.node.off(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
+          }
+          if (this.mediaRecorder && this.isRecording) {
+            this.mediaRecorder.stop();
+          }
         };
         return Voiceinput;
       }(Component), _descriptor = _applyDecoratedDescriptor(_class2.prototype, "btnVoiceInput", [_dec2], {
