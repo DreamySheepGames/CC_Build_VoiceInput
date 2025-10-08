@@ -420,7 +420,7 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
 });
 
 System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc'], function (exports) {
-  var _applyDecoratedDescriptor, _inheritsLoose, _initializerDefineProperty, _assertThisInitialized, _asyncToGenerator, _regeneratorRuntime, cclegacy, _decorator, Button, Label, Component;
+  var _applyDecoratedDescriptor, _inheritsLoose, _initializerDefineProperty, _assertThisInitialized, _asyncToGenerator, _regeneratorRuntime, cclegacy, _decorator, Button, EditBox, Label, Component;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -433,15 +433,16 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
       cclegacy = module.cclegacy;
       _decorator = module._decorator;
       Button = module.Button;
+      EditBox = module.EditBox;
       Label = module.Label;
       Component = module.Component;
     }],
     execute: function () {
-      var _dec, _dec2, _class, _class2, _descriptor;
+      var _dec, _dec2, _dec3, _class, _class2, _descriptor, _descriptor2;
       cclegacy._RF.push({}, "00d40Jp615IA5Hvg9OYjSmY", "Voiceinput", undefined);
       var ccclass = _decorator.ccclass,
         property = _decorator.property;
-      var Voiceinput = exports('Voiceinput', (_dec = ccclass('Voiceinput'), _dec2 = property(Button), _dec(_class = (_class2 = /*#__PURE__*/function (_Component) {
+      var Voiceinput = exports('Voiceinput', (_dec = ccclass('Voiceinput'), _dec2 = property(Button), _dec3 = property(EditBox), _dec(_class = (_class2 = /*#__PURE__*/function (_Component) {
         _inheritsLoose(Voiceinput, _Component);
         function Voiceinput() {
           var _this;
@@ -450,6 +451,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           }
           _this = _Component.call.apply(_Component, [this].concat(args)) || this;
           _initializerDefineProperty(_this, "btnVoiceInput", _descriptor, _assertThisInitialized(_this));
+          _initializerDefineProperty(_this, "inputField", _descriptor2, _assertThisInitialized(_this));
           _this.isRecording = false;
           _this.mediaRecorder = null;
           _this.audioChunks = [];
@@ -481,7 +483,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   });
                 case 5:
                   stream = _context.sent;
-                  console.log("Got audio");
+                  console.log("Got micro of the device");
                   this.audioChunks = [];
                   this.mediaRecorder = new MediaRecorder(stream);
                   this.mediaRecorder.ondataavailable = function (event) {
@@ -501,9 +503,10 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     // Try to play audio:
                     var audio = new Audio(url);
                     audio.play();
-                    // Or send this blob to Telegram WebApp server in the future
-                  };
 
+                    // Speech to text
+                    _this2.StartSpeedToText(blob, url);
+                  };
                   this.mediaRecorder.start();
                   this.isRecording = true;
                   this.UpdateButtonState();
@@ -542,6 +545,42 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
             }
           }
         };
+        _proto.StartSpeedToText = function StartSpeedToText(blob, url) {
+          var _this3 = this;
+          try {
+            var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+              console.error("SpeechRecognition API is not supported in this browser.");
+              return;
+            }
+            var recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.onresult = function (event) {
+              var transcript = event.results[0][0].transcript;
+              console.log("Recognized:", transcript);
+
+              // Insert text into EditBox
+              if (_this3.inputField) {
+                _this3.inputField.string = transcript;
+              }
+            };
+            recognition.onerror = function (err) {
+              console.error("Speech recognition error:", err);
+            };
+            recognition.onend = function () {
+              console.log("Speech recognition ended.");
+            };
+            recognition.start();
+            console.log("Speech recognition started...");
+          } catch (e) {
+            console.error("Failed to start speech recognition:", e);
+          }
+
+          // free memory after recording
+          URL.revokeObjectURL(url);
+          console.log('Freed blob URL:', url);
+        };
         _proto.onDestroy = function onDestroy() {
           if (this.btnVoiceInput) {
             this.btnVoiceInput.node.off(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
@@ -551,14 +590,21 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           }
         };
         return Voiceinput;
-      }(Component), _descriptor = _applyDecoratedDescriptor(_class2.prototype, "btnVoiceInput", [_dec2], {
+      }(Component), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "btnVoiceInput", [_dec2], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function initializer() {
           return null;
         }
-      }), _class2)) || _class));
+      }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "inputField", [_dec3], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function initializer() {
+          return null;
+        }
+      })), _class2)) || _class));
       cclegacy._RF.pop();
     }
   };

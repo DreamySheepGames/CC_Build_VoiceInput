@@ -4,8 +4,8 @@
     "name": "main",
     "deps": [],
     "uuids": [
-        "04b6f90cd",
-        "0f9f6554d",
+        "06183ee81",
+        "07afc6510",
         "20835ba4-6145-4fbc-a58a-051ce700aa3e",
         "20835ba4-6145-4fbc-a58a-051ce700aa3e@6c48a",
         "20835ba4-6145-4fbc-a58a-051ce700aa3e@f9941",
@@ -24,6 +24,9 @@
         "bcb56ade-6018-43cb-8321-24d0555f57e4",
         "bcb56ade-6018-43cb-8321-24d0555f57e4@6c48a",
         "bcb56ade-6018-43cb-8321-24d0555f57e4@f9941",
+        "bd1bcaba-bd7d-4a71-b143-997c882383e4",
+        "bd1bcaba-bd7d-4a71-b143-997c882383e4@6c48a",
+        "bd1bcaba-bd7d-4a71-b143-997c882383e4@f9941",
         "fd8ec536-a354-4a17-9c74-4f3883c378c8"
     ],
     "paths": {
@@ -53,20 +56,22 @@
         "db://assets/Scenes/Game.scene": "3b9d4dd8-dd61-4f52-b3b1-6effe2a75d61"
     },
     "packs": {
-        "0f9f6554d": [
+        "07afc6510": [
             "544e49d6-3f05-4fa8-9a9e-091f98fc2ce8@6c48a",
             "20835ba4-6145-4fbc-a58a-051ce700aa3e@6c48a",
             "951249e0-9f16-456d-8b85-a6ca954da16b@6c48a",
             "b2cf231b-756f-48d7-9ba8-c40ffbf16b1e@6c48a",
-            "bcb56ade-6018-43cb-8321-24d0555f57e4@6c48a"
+            "bcb56ade-6018-43cb-8321-24d0555f57e4@6c48a",
+            "bd1bcaba-bd7d-4a71-b143-997c882383e4@6c48a"
         ],
-        "04b6f90cd": [
+        "06183ee81": [
             "20835ba4-6145-4fbc-a58a-051ce700aa3e@f9941",
             "3b9d4dd8-dd61-4f52-b3b1-6effe2a75d61",
             "544e49d6-3f05-4fa8-9a9e-091f98fc2ce8@f9941",
             "951249e0-9f16-456d-8b85-a6ca954da16b@f9941",
             "b2cf231b-756f-48d7-9ba8-c40ffbf16b1e@f9941",
-            "bcb56ade-6018-43cb-8321-24d0555f57e4@f9941"
+            "bcb56ade-6018-43cb-8321-24d0555f57e4@f9941",
+            "bd1bcaba-bd7d-4a71-b143-997c882383e4@f9941"
         ]
     },
     "versions": {
