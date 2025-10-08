@@ -505,8 +505,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                       _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
 
                       // auto start new regcognition session
-                      _this2.recognition.stop();
-                      _this2.recognition.start();
+                      //this.recognition.start();
                       _this2.labelInform.string = 'Recording...';
                     }
                   };
@@ -516,10 +515,14 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   this.recognition.onend = function () {
                     console.log("Speech recognition ended.");
                     if (_this2.isRecording) {
-                      _this2.recognition.start();
-                      _this2.labelInform.string = 'Recording...';
+                      _this2.isRecording = false;
+                      _this2.UpdateButtonState();
+                      _this2.labelInform.string = "Speech ended, please record again!";
+                      // this.recognition.start();
+                      // this.labelInform.string = 'Recording...';
                     }
                   };
+
                   this.recognition.start();
                   _context.next = 26;
                   break;
