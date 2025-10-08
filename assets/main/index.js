@@ -505,6 +505,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                       _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
 
                       // auto start new regcognition session
+                      _this2.recognition.stop();
                       _this2.recognition.start();
                       _this2.labelInform.string = 'Recording...';
                     }
