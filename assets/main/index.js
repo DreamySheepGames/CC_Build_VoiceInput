@@ -438,11 +438,11 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
       Component = module.Component;
     }],
     execute: function () {
-      var _dec, _dec2, _dec3, _class, _class2, _descriptor, _descriptor2;
+      var _dec, _dec2, _dec3, _dec4, _class, _class2, _descriptor, _descriptor2, _descriptor3;
       cclegacy._RF.push({}, "00d40Jp615IA5Hvg9OYjSmY", "Voiceinput", undefined);
       var ccclass = _decorator.ccclass,
         property = _decorator.property;
-      var Voiceinput = exports('Voiceinput', (_dec = ccclass('Voiceinput'), _dec2 = property(Button), _dec3 = property(EditBox), _dec(_class = (_class2 = /*#__PURE__*/function (_Component) {
+      var Voiceinput = exports('Voiceinput', (_dec = ccclass('Voiceinput'), _dec2 = property(Button), _dec3 = property(EditBox), _dec4 = property(Label), _dec(_class = (_class2 = /*#__PURE__*/function (_Component) {
         _inheritsLoose(Voiceinput, _Component);
         function Voiceinput() {
           var _this;
@@ -452,6 +452,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           _this = _Component.call.apply(_Component, [this].concat(args)) || this;
           _initializerDefineProperty(_this, "btnVoiceInput", _descriptor, _assertThisInitialized(_this));
           _initializerDefineProperty(_this, "inputField", _descriptor2, _assertThisInitialized(_this));
+          _initializerDefineProperty(_this, "labelInform", _descriptor3, _assertThisInitialized(_this));
           _this.isRecording = false;
           _this.recognition = void 0;
           return _this;
@@ -471,22 +472,25 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
               while (1) switch (_context.prev = _context.next) {
                 case 0:
                   if (this.isRecording) {
-                    _context.next = 18;
+                    _context.next = 21;
                     break;
                   }
                   console.log('Start speech recognition...');
+                  this.labelInform.string = 'Start speech recognition...';
                   this.isRecording = true;
                   this.UpdateButtonState();
 
                   // init speech recognition
                   SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                   if (SpeechRecognition) {
-                    _context.next = 8;
+                    _context.next = 10;
                     break;
                   }
                   console.error("SpeechRecognition not supported in this browser.");
+                  this.labelInform.string = 'SpeechRecognition not supported in this browser.';
                   return _context.abrupt("return");
-                case 8:
+                case 10:
+                  this.labelInform.string = 'Recording...';
                   // setup recognition
                   this.recognition = new SpeechRecognition();
                   this.recognition.lang = 'en-US';
@@ -499,6 +503,10 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     // add text into input field
                     if (_this2.inputField) {
                       _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
+
+                      // auto start new regcognition session
+                      _this2.recognition.start();
+                      _this2.labelInform.string = 'Recording...';
                     }
                   };
                   this.recognition.onerror = function (err) {
@@ -506,20 +514,24 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   };
                   this.recognition.onend = function () {
                     console.log("Speech recognition ended.");
-                    if (_this2.isRecording) ;
+                    if (_this2.isRecording) {
+                      _this2.recognition.start();
+                      _this2.labelInform.string = 'Recording...';
+                    }
                   };
                   this.recognition.start();
-                  _context.next = 22;
+                  _context.next = 26;
                   break;
-                case 18:
+                case 21:
                   console.log('Stop speech recognition.');
+                  this.labelInform.string = 'speech recognition stopped!';
                   this.isRecording = false;
                   this.UpdateButtonState();
                   if (this.recognition) {
                     this.recognition.stop();
                     this.recognition = null;
                   }
-                case 22:
+                case 26:
                 case "end":
                   return _context.stop();
               }
@@ -552,6 +564,13 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           return null;
         }
       }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "inputField", [_dec3], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function initializer() {
+          return null;
+        }
+      }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "labelInform", [_dec4], {
         configurable: true,
         enumerable: true,
         writable: true,
