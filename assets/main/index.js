@@ -504,6 +504,16 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     if (_this2.inputField) {
                       _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
 
+                      // Auto-scroll to bottom
+                      _this2.scheduleOnce(function () {
+                        var editBoxImpl = _this2.inputField._impl;
+                        if (editBoxImpl && editBoxImpl._inputEl) {
+                          var inputEl = editBoxImpl._inputEl;
+                          inputEl.scrollTop = inputEl.scrollHeight;
+                          inputEl.scrollLeft = inputEl.scrollWidth;
+                        }
+                      }, 5 / 60); // about 5 frame if 60fps
+
                       // auto start new regcognition session
                       //this.recognition.start();
                       _this2.labelInform.string = 'Recording...';
