@@ -559,8 +559,6 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
             recognition.onresult = function (event) {
               var transcript = event.results[0][0].transcript;
               console.log("Recognized:", transcript);
-
-              // Insert text into EditBox
               if (_this3.inputField) {
                 _this3.inputField.string = transcript;
               }
@@ -570,16 +568,16 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
             };
             recognition.onend = function () {
               console.log("Speech recognition ended.");
+
+              // free blob URL AFTER recognition
+              URL.revokeObjectURL(url);
+              console.log('Freed blob URL:', url);
             };
             recognition.start();
             console.log("Speech recognition started...");
           } catch (e) {
             console.error("Failed to start speech recognition:", e);
           }
-
-          // free memory after recording
-          URL.revokeObjectURL(url);
-          console.log('Freed blob URL:', url);
         };
         _proto.onDestroy = function onDestroy() {
           if (this.btnVoiceInput) {
