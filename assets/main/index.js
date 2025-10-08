@@ -505,8 +505,9 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     audio.play();
 
                     // Speech to text
-                    _this2.StartSpeedToText(blob, url);
+                    // this.StartSpeedToText(blob, url);
                   };
+
                   this.mediaRecorder.start();
                   this.isRecording = true;
                   this.UpdateButtonState();
