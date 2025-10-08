@@ -453,8 +453,6 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           _initializerDefineProperty(_this, "btnVoiceInput", _descriptor, _assertThisInitialized(_this));
           _initializerDefineProperty(_this, "inputField", _descriptor2, _assertThisInitialized(_this));
           _this.isRecording = false;
-          _this.mediaRecorder = null;
-          _this.audioChunks = [];
           _this.recognition = void 0;
           return _this;
         }
@@ -476,9 +474,11 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     _context.next = 18;
                     break;
                   }
-                  console.log('🎙 Start speech recognition...');
+                  console.log('Start speech recognition...');
                   this.isRecording = true;
                   this.UpdateButtonState();
+
+                  // init speech recognition
                   SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                   if (SpeechRecognition) {
                     _context.next = 8;
@@ -487,6 +487,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   console.error("SpeechRecognition not supported in this browser.");
                   return _context.abrupt("return");
                 case 8:
+                  // setup recognition
                   this.recognition = new SpeechRecognition();
                   this.recognition.lang = 'en-US';
                   this.recognition.continuous = true;
@@ -494,7 +495,11 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   this.recognition.onresult = function (event) {
                     var transcript = event.results[event.resultIndex][0].transcript;
                     console.log("Recognized:", transcript);
-                    if (_this2.inputField) _this2.inputField.string = transcript;
+
+                    // add text into input field
+                    if (_this2.inputField) {
+                      _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
+                    }
                   };
                   this.recognition.onerror = function (err) {
                     console.error("Speech recognition error:", err);
@@ -532,56 +537,10 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
               label.string = this.isRecording ? 'Stop' : 'Start';
             }
           }
-        }
-
-        // StartSpeedToText(blob: Blob, url: string) {
-        //     try {
-        //         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        //
-        //         if (!SpeechRecognition) {
-        //             console.error("SpeechRecognition API is not supported in this browser.");
-        //             return;
-        //         }
-        //
-        //         const recognition = new SpeechRecognition();
-        //         recognition.lang = 'en-US';
-        //         recognition.interimResults = false;
-        //
-        //         recognition.onresult = (event: any) => {
-        //             const transcript = event.results[0][0].transcript;
-        //             console.log("Recognized:", transcript);
-        //
-        //             if (this.inputField) {
-        //                 this.inputField.string = transcript;
-        //             }
-        //         };
-        //
-        //         recognition.onerror = (err: any) => {
-        //             console.error("Speech recognition error:", err);
-        //         };
-        //
-        //         recognition.onend = () => {
-        //             console.log("Speech recognition ended.");
-        //
-        //             // free blob URL AFTER recognition
-        //             URL.revokeObjectURL(url);
-        //             console.log('Freed blob URL:', url);
-        //         };
-        //
-        //         recognition.start();
-        //         console.log("Speech recognition started...");
-        //     } catch (e) {
-        //         console.error("Failed to start speech recognition:", e);
-        //     }
-        // }
-        ;
-
+        };
         _proto.onDestroy = function onDestroy() {
           if (this.btnVoiceInput) {
             this.btnVoiceInput.node.off(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
-          }
-          if (this.mediaRecorder && this.isRecording) {
-            this.mediaRecorder.stop();
           }
         };
         return Voiceinput;
