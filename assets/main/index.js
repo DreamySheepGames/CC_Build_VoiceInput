@@ -452,6 +452,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           _initializerDefineProperty(_this, "labelInform", _descriptor3, _assertThisInitialized(_this));
           _this.isRecording = false;
           _this.recognition = void 0;
+          _this.audioStream = null;
           _this.audioTrack = null;
           _this.isReady = false;
           _this.pendingStart = false;
@@ -461,19 +462,19 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
         _proto.onLoad = /*#__PURE__*/function () {
           var _onLoad = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
             var _this2 = this;
-            var SpeechRecognition, stream, tracks;
+            var SpeechRecognition;
             return _regeneratorRuntime().wrap(function _callee$(_context) {
               while (1) switch (_context.prev = _context.next) {
                 case 0:
                   SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
                   if (SpeechRecognition) {
-                    _context.next = 4;
+                    _context.next = 5;
                     break;
                   }
                   console.error("SpeechRecognition not supported in this browser.");
+                  if (this.labelInform) this.labelInform.string = 'SpeechRecognition not supported';
                   return _context.abrupt("return");
-                case 4:
-                  // tạo recognition instance
+                case 5:
                   this.recognition = new SpeechRecognition();
                   this.recognition.lang = 'en-US';
                   this.recognition.continuous = true;
@@ -481,29 +482,6 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   this.isRecording = false;
                   this.isReady = false;
                   this.pendingStart = false;
-
-                  // lấy audio track (có thể dùng cho start(track))
-                  _context.prev = 11;
-                  _context.next = 14;
-                  return navigator.mediaDevices.getUserMedia({
-                    audio: true
-                  });
-                case 14:
-                  stream = _context.sent;
-                  tracks = stream.getAudioTracks();
-                  if (tracks.length > 0) {
-                    this.audioTrack = tracks[0];
-                    console.log('Got local audio track for speech recognition:', this.audioTrack.label);
-                  }
-                  _context.next = 23;
-                  break;
-                case 19:
-                  _context.prev = 19;
-                  _context.t0 = _context["catch"](11);
-                  console.warn('Failed to getUserMedia for track:', _context.t0);
-                  this.audioTrack = null;
-                case 23:
-                  // setup callbacks
                   this.recognition.onstart = function () {
                     _this2.isRecording = true;
                     _this2.isReady = true;
@@ -518,9 +496,10 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     }
                   };
                   this.recognition.onerror = function (err) {
-                    console.error("Speech recognition error:", err.error);
-                    if (err.error === 'not-allowed' || err.error === 'service-not-allowed') {
+                    console.error("Speech recognition error:", err);
+                    if (err && (err.error === 'not-allowed' || err.error === 'service-not-allowed')) {
                       _this2.isReady = false;
+                      if (_this2.labelInform) _this2.labelInform.string = 'Permission denied. Please allow microphone in settings.';
                     }
                     _this2.isRecording = false;
                     _this2.UpdateButtonState();
@@ -529,18 +508,19 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     console.warn("Speech recognition ended.");
                     _this2.isRecording = false;
                     _this2.UpdateButtonState();
+
+                    // nếu user vẫn muốn tiếp tục, restart after small delay
                     if (_this2.pendingStart) {
-                      console.log("Restarting speech recognition silently...");
                       setTimeout(function () {
                         _this2.safeStartRecognition();
                       }, 300);
                     }
                   };
-                case 27:
+                case 16:
                 case "end":
                   return _context.stop();
               }
-            }, _callee, this, [[11, 19]]);
+            }, _callee, this);
           }));
           function onLoad() {
             return _onLoad.apply(this, arguments);
@@ -555,33 +535,51 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
         };
         _proto.OnVoiceButtonPressed = /*#__PURE__*/function () {
           var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+            var ok;
             return _regeneratorRuntime().wrap(function _callee2$(_context2) {
               while (1) switch (_context2.prev = _context2.next) {
                 case 0:
                   if (this.pendingStart) {
-                    _context2.next = 9;
+                    _context2.next = 16;
                     break;
                   }
-                  console.log('Start speech recognition...');
-                  this.labelInform.string = 'Listening...';
+                  console.log('Start requested...');
+                  if (this.labelInform) this.labelInform.string = 'Requesting microphone...';
                   this.pendingStart = true;
                   this.UpdateButtonState();
+
+                  // 1) đảm bảo có audioStream trước
                   _context2.next = 7;
-                  return this.safeStartRecognition();
+                  return this.ensureAudioStream();
                 case 7:
+                  ok = _context2.sent;
+                  if (ok) {
+                    _context2.next = 12;
+                    break;
+                  }
+                  // ensureAudioStream đã set labelInform, reset pending
+                  this.pendingStart = false;
+                  this.UpdateButtonState();
+                  return _context2.abrupt("return");
+                case 12:
                   _context2.next = 14;
+                  return this.safeStartRecognition();
+                case 14:
+                  _context2.next = 21;
                   break;
-                case 9:
-                  console.log('Stop speech recognition.');
-                  this.labelInform.string = 'Speech recognition stopped!';
+                case 16:
+                  console.log('Stop requested...');
+                  if (this.labelInform) this.labelInform.string = 'Speech recognition stopped!';
                   this.pendingStart = false;
                   this.UpdateButtonState();
                   try {
                     this.recognition.stop();
                   } catch (err) {
-                    console.warn("Stop failed:", err);
+                    console.warn("recognition.stop() failed:", err);
                   }
-                case 14:
+                // NOTE: không stop audioTrack ở đây để tránh prompt lại khi user start lại;
+                // nếu muốn release mic khi user bấm stop lâu dài, có thể stop track.
+                case 21:
                 case "end":
                   return _context2.stop();
               }
@@ -593,39 +591,114 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           return OnVoiceButtonPressed;
         }()
         /**
-         * Thử start(track) nếu có hỗ trợ, fallback sang start() nếu không.
+         * Tries to get microphone stream and keep it open.
+         * Returns true if we have a live audioTrack.
+         */;
+
+        _proto.ensureAudioStream = /*#__PURE__*/
+        function () {
+          var _ensureAudioStream = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+            var s, tracks;
+            return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+              while (1) switch (_context3.prev = _context3.next) {
+                case 0:
+                  if (!(this.audioTrack && this.audioTrack.readyState === 'live')) {
+                    _context3.next = 2;
+                    break;
+                  }
+                  return _context3.abrupt("return", true);
+                case 2:
+                  _context3.prev = 2;
+                  _context3.next = 5;
+                  return navigator.mediaDevices.getUserMedia({
+                    audio: true
+                  });
+                case 5:
+                  s = _context3.sent;
+                  tracks = s.getAudioTracks();
+                  if (!(tracks && tracks.length > 0)) {
+                    _context3.next = 15;
+                    break;
+                  }
+                  this.audioStream = s;
+                  this.audioTrack = tracks[0];
+                  console.log('Acquired audio track:', this.audioTrack.label);
+                  if (this.labelInform) this.labelInform.string = 'Microphone granted (keeping open)';
+                  return _context3.abrupt("return", true);
+                case 15:
+                  console.warn('No audio tracks found in stream');
+                  if (this.labelInform) this.labelInform.string = 'No audio device found';
+                  return _context3.abrupt("return", false);
+                case 18:
+                  _context3.next = 25;
+                  break;
+                case 20:
+                  _context3.prev = 20;
+                  _context3.t0 = _context3["catch"](2);
+                  console.warn('getUserMedia failed:', _context3.t0);
+                  // nếu bị từ chối, hướng dẫn người dùng bật quyền app-level
+                  if (_context3.t0 && _context3.t0.name === 'NotAllowedError') {
+                    if (this.labelInform) this.labelInform.string = 'Please allow microphone in app settings.';
+                  } else {
+                    if (this.labelInform) this.labelInform.string = 'Microphone error: ' + (_context3.t0 && _context3.t0.message ? _context3.t0.message : 'unknown');
+                  }
+                  return _context3.abrupt("return", false);
+                case 25:
+                case "end":
+                  return _context3.stop();
+              }
+            }, _callee3, this, [[2, 20]]);
+          }));
+          function ensureAudioStream() {
+            return _ensureAudioStream.apply(this, arguments);
+          }
+          return ensureAudioStream;
+        }()
+        /**
+         * Try start(recognition) with a track (experimental) then fallback to start()
          */;
 
         _proto.safeStartRecognition = /*#__PURE__*/
         function () {
-          var _safeStartRecognition = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-            return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-              while (1) switch (_context3.prev = _context3.next) {
+          var _safeStartRecognition = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+            return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+              while (1) switch (_context4.prev = _context4.next) {
                 case 0:
                   if (this.recognition) {
-                    _context3.next = 2;
+                    _context4.next = 2;
                     break;
                   }
-                  return _context3.abrupt("return");
+                  return _context4.abrupt("return");
                 case 2:
                   if (!this.audioTrack) {
-                    _context3.next = 12;
+                    _context4.next = 13;
                     break;
                   }
-                  _context3.prev = 3;
-                  // Một số browser mới (Chrome Canary / Edge Dev / WebKit Preview) hỗ trợ experimental start(track)
+                  _context4.prev = 3;
+                  // some UA implement start(MediaStreamTrack)
                   this.recognition.start(this.audioTrack);
-                  console.log('Started recognition with MediaStreamTrack');
-                  return _context3.abrupt("return");
-                case 9:
-                  _context3.prev = 9;
-                  _context3.t0 = _context3["catch"](3);
-                  console.warn('start(track) not supported, falling back:', _context3.t0);
-                case 12:
+                  console.log('recognition.start(track) called');
+                  if (this.labelInform) this.labelInform.string = 'Listening (track mode)...';
+                  return _context4.abrupt("return");
+                case 10:
+                  _context4.prev = 10;
+                  _context4.t0 = _context4["catch"](3);
+                  console.warn('start(track) not supported, fallback to start():', _context4.t0);
+                case 13:
+                  // fallback: classic start()
+                  try {
+                    this.recognition.start();
+                    console.log('recognition.start() called (fallback)');
+                    if (this.labelInform) this.labelInform.string = 'Listening...';
+                  } catch (err) {
+                    console.error('recognition.start() failed:', err);
+                    if (this.labelInform) this.labelInform.string = 'Start failed: ' + (err && err.message ? err.message : String(err));
+                  }
+                case 14:
                 case "end":
-                  return _context3.stop();
+                  return _context4.stop();
               }
-            }, _callee3, this, [[3, 9]]);
+            }, _callee4, this, [[3, 10]]);
           }));
           function safeStartRecognition() {
             return _safeStartRecognition.apply(this, arguments);
@@ -644,8 +717,12 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           if (this.btnVoiceInput) {
             this.btnVoiceInput.node.off(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
           }
-          if (this.audioTrack) {
-            this.audioTrack.stop();
+          // release audio resources on destroy
+          if (this.audioStream) {
+            this.audioStream.getTracks().forEach(function (t) {
+              return t.stop();
+            });
+            this.audioStream = null;
             this.audioTrack = null;
           }
         };
