@@ -452,16 +452,17 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           _initializerDefineProperty(_this, "labelInform", _descriptor3, _assertThisInitialized(_this));
           _initializerDefineProperty(_this, "labelDebug", _descriptor4, _assertThisInitialized(_this));
           _this.isRecording = false;
-          _this.recognition = void 0;
+          _this.recognition = null;
           return _this;
         }
         var _proto = Voiceinput.prototype;
         _proto.onLoad = function onLoad() {
           var _this2 = this;
           this.PermissionCheck();
-          var SpeechRecognition = window.webkitSpeechRecognition;
+          var SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
           if (!SpeechRecognition) {
             console.error("SpeechRecognition not supported in this browser.");
+            if (this.labelInform) this.labelInform.string = "SpeechRecognition not supported.";
             return;
           }
           this.recognition = new SpeechRecognition();
@@ -477,15 +478,12 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           };
           this.recognition.onerror = function (err) {
             console.error("Speech recognition error:", err);
+            if (_this2.labelInform) _this2.labelInform.string = "Speech recognition error: " + err.error;
           };
           this.recognition.onend = function () {
             _this2.isRecording = false;
             _this2.UpdateButtonState();
             console.log("Speech recognition ended.");
-            // if (this.isRecording) {
-            //     this.recognition.start(); // auto restart if still recording
-            // }
-
             _this2.PermissionCheck();
           };
         };
@@ -497,15 +495,34 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
         };
         _proto.OnVoiceButtonPressed = /*#__PURE__*/function () {
           var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+            var perm;
             return _regeneratorRuntime().wrap(function _callee$(_context) {
               while (1) switch (_context.prev = _context.next) {
                 case 0:
+                  _context.next = 2;
+                  return this.RequestMicPermissionTelegram();
+                case 2:
+                  perm = _context.sent;
+                  if (!(perm !== 'granted' && perm !== 'unknown')) {
+                    _context.next = 7;
+                    break;
+                  }
+                  this.labelInform.string = 'Microphone permission not granted.';
+                  this.labelDebug.string = 'Telegram mic permission = ' + perm;
+                  return _context.abrupt("return");
+                case 7:
+                  // 🔹 2️⃣ Nếu có quyền rồi => bắt đầu hoặc dừng recognition
                   if (!this.isRecording) {
                     console.log('Start speech recognition...');
                     this.labelInform.string = 'Recording...';
                     this.isRecording = true;
                     this.UpdateButtonState();
-                    this.recognition.start();
+                    try {
+                      this.recognition.start();
+                    } catch (e) {
+                      console.error('Recognition start error:', e);
+                      this.labelInform.string = 'Cannot start recognition.';
+                    }
                   } else {
                     console.log('Stop speech recognition.');
                     this.labelInform.string = 'Speech recognition stopped!';
@@ -514,7 +531,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     this.recognition.stop();
                   }
                   this.PermissionCheck();
-                case 2:
+                case 9:
                 case "end":
                   return _context.stop();
               }
@@ -556,7 +573,51 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           } else {
             console.warn('Permissions API not available in this WebView');
           }
-        };
+        }
+
+        /**
+         * 🔸 Gọi Telegram WebApp API để xin quyền microphone (nếu chạy trong Telegram)
+         * Trả về:
+         * - 'granted' nếu user cho phép
+         * - 'denied' nếu từ chối
+         * - 'unknown' nếu không chạy trong Telegram
+         */;
+        _proto.RequestMicPermissionTelegram = /*#__PURE__*/
+        function () {
+          var _RequestMicPermissionTelegram = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+            return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+              while (1) switch (_context2.prev = _context2.next) {
+                case 0:
+                  return _context2.abrupt("return", new Promise(function (resolve) {
+                    var _Telegram;
+                    var tg = (_Telegram = window.Telegram) == null ? void 0 : _Telegram.WebApp;
+                    if (!tg || !tg.requestPermission) {
+                      console.log('Telegram WebApp SDK not available, using browser permission.');
+                      resolve('unknown');
+                      return;
+                    }
+                    try {
+                      tg.ready();
+                      tg.requestPermission('microphone', function (status) {
+                        console.log('Telegram mic permission:', status);
+                        resolve(status);
+                      });
+                    } catch (e) {
+                      console.warn('Telegram mic permission error:', e);
+                      resolve('unknown');
+                    }
+                  }));
+                case 1:
+                case "end":
+                  return _context2.stop();
+              }
+            }, _callee2);
+          }));
+          function RequestMicPermissionTelegram() {
+            return _RequestMicPermissionTelegram.apply(this, arguments);
+          }
+          return RequestMicPermissionTelegram;
+        }();
         return Voiceinput;
       }(Component), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "btnVoiceInput", [_dec2], {
         configurable: true,
