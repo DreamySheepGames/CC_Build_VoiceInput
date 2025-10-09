@@ -343,9 +343,8 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
           });
         };
         _proto.ProcessInitData = function ProcessInitData() {
-          var _window$Telegram, _window$Telegram2;
+          var _window$Telegram;
           var initData = (_window$Telegram = window['Telegram']) == null || (_window$Telegram = _window$Telegram.WebApp) == null ? void 0 : _window$Telegram.initData;
-          TelegramHandler.webApp = (_window$Telegram2 = window['Telegram']) == null ? void 0 : _window$Telegram2.WebApp;
 
           //console.log('window.WebApp.initDataUnsafe: ', window['Telegram'].WebApp.initDataUnsafe);
           if (initData) {
@@ -402,7 +401,6 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
                   _context.prev = 7;
                   _context.t0 = _context["catch"](0);
                   console.error('Failed to load Telegram SDK:', _context.t0);
-                //this.LoadGameScene();
                 case 10:
                 case "end":
                   return _context.stop();
@@ -415,14 +413,14 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
           return InitTelegram;
         }();
         return TelegramHandler;
-      }(Component), _class2.instance = null, _class2.telegramInitData = '', _class2.telegramQueryId = '', _class2.webApp = null, _class2)) || _class));
+      }(Component), _class2.instance = null, _class2.telegramInitData = '', _class2.telegramQueryId = '', _class2)) || _class));
       cclegacy._RF.pop();
     }
   };
 });
 
-System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './TelegramHandler.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _inheritsLoose, _initializerDefineProperty, _assertThisInitialized, _asyncToGenerator, _regeneratorRuntime, cclegacy, _decorator, Button, EditBox, Label, Component, TelegramHandler;
+System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc'], function (exports) {
+  var _applyDecoratedDescriptor, _inheritsLoose, _initializerDefineProperty, _assertThisInitialized, _asyncToGenerator, _regeneratorRuntime, cclegacy, _decorator, Button, EditBox, Label, Component;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -438,15 +436,13 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
       EditBox = module.EditBox;
       Label = module.Label;
       Component = module.Component;
-    }, function (module) {
-      TelegramHandler = module.TelegramHandler;
     }],
     execute: function () {
-      var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5;
+      var _dec, _dec2, _dec3, _dec4, _class, _class2, _descriptor, _descriptor2, _descriptor3;
       cclegacy._RF.push({}, "00d40Jp615IA5Hvg9OYjSmY", "Voiceinput", undefined);
       var ccclass = _decorator.ccclass,
         property = _decorator.property;
-      var Voiceinput = exports('Voiceinput', (_dec = ccclass('Voiceinput'), _dec2 = property(Button), _dec3 = property(EditBox), _dec4 = property(Label), _dec5 = property(Label), _dec6 = property(Label), _dec(_class = (_class2 = /*#__PURE__*/function (_Component) {
+      var Voiceinput = exports('Voiceinput', (_dec = ccclass('Voiceinput'), _dec2 = property(Button), _dec3 = property(EditBox), _dec4 = property(Label), _dec(_class = (_class2 = /*#__PURE__*/function (_Component) {
         _inheritsLoose(Voiceinput, _Component);
         function Voiceinput() {
           var _this;
@@ -457,20 +453,16 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           _initializerDefineProperty(_this, "btnVoiceInput", _descriptor, _assertThisInitialized(_this));
           _initializerDefineProperty(_this, "inputField", _descriptor2, _assertThisInitialized(_this));
           _initializerDefineProperty(_this, "labelInform", _descriptor3, _assertThisInitialized(_this));
-          _initializerDefineProperty(_this, "labelDebug", _descriptor4, _assertThisInitialized(_this));
-          _initializerDefineProperty(_this, "labelSDKVersion", _descriptor5, _assertThisInitialized(_this));
           _this.isRecording = false;
-          _this.recognition = null;
+          _this.recognition = void 0;
           return _this;
         }
         var _proto = Voiceinput.prototype;
         _proto.onLoad = function onLoad() {
           var _this2 = this;
-          this.PermissionCheck();
-          var SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+          var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
           if (!SpeechRecognition) {
             console.error("SpeechRecognition not supported in this browser.");
-            if (this.labelInform) this.labelInform.string = "SpeechRecognition not supported.";
             return;
           }
           this.recognition = new SpeechRecognition();
@@ -486,15 +478,17 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           };
           this.recognition.onerror = function (err) {
             console.error("Speech recognition error:", err);
-            if (_this2.labelInform) _this2.labelInform.string = "Speech recognition error: " + err.error;
           };
           this.recognition.onend = function () {
             _this2.isRecording = false;
             _this2.UpdateButtonState();
             console.log("Speech recognition ended.");
-            _this2.PermissionCheck();
+            // if (this.isRecording) {
+            //     this.recognition.start(); // auto restart if still recording
+            // }
           };
         };
+
         _proto.start = function start() {
           if (this.btnVoiceInput) {
             this.btnVoiceInput.node.on(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
@@ -503,34 +497,15 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
         };
         _proto.OnVoiceButtonPressed = /*#__PURE__*/function () {
           var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-            var perm;
             return _regeneratorRuntime().wrap(function _callee$(_context) {
               while (1) switch (_context.prev = _context.next) {
                 case 0:
-                  _context.next = 2;
-                  return this.RequestMicPermissionTelegram();
-                case 2:
-                  perm = _context.sent;
-                  if (!(perm !== 'granted' && perm !== 'unknown')) {
-                    _context.next = 7;
-                    break;
-                  }
-                  this.labelInform.string = 'Microphone permission not granted.';
-                  this.labelDebug.string = 'Telegram mic permission = ' + perm;
-                  return _context.abrupt("return");
-                case 7:
-                  // 🔹 2️⃣ Nếu có quyền rồi => bắt đầu hoặc dừng recognition
                   if (!this.isRecording) {
                     console.log('Start speech recognition...');
                     this.labelInform.string = 'Recording...';
                     this.isRecording = true;
                     this.UpdateButtonState();
-                    try {
-                      this.recognition.start();
-                    } catch (e) {
-                      console.error('Recognition start error:', e);
-                      this.labelInform.string = 'Cannot start recognition.';
-                    }
+                    this.recognition.start();
                   } else {
                     console.log('Stop speech recognition.');
                     this.labelInform.string = 'Speech recognition stopped!';
@@ -538,8 +513,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                     this.UpdateButtonState();
                     this.recognition.stop();
                   }
-                  this.PermissionCheck();
-                case 9:
+                case 1:
                 case "end":
                   return _context.stop();
               }
@@ -563,72 +537,6 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
             this.btnVoiceInput.node.off(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
           }
         };
-        _proto.PermissionCheck = function PermissionCheck() {
-          var _this3 = this;
-          if (navigator.permissions && navigator.permissions.query) {
-            navigator.permissions.query({
-              name: 'microphone'
-            }).then(function (s) {
-              console.log('permissions.microphone state =', s.state);
-              _this3.labelDebug.string = 'permissions.microphone state = ' + s.state;
-              s.onchange = function () {
-                console.log('perm changed ->', s.state);
-                _this3.labelDebug.string = 'perm changed = ' + s.state;
-              };
-            })["catch"](function (e) {
-              return console.warn('perm query error', e);
-            });
-          } else {
-            console.warn('Permissions API not available in this WebView');
-          }
-        }
-
-        /**
-         * 🔸 Gọi Telegram WebApp API để xin quyền microphone (nếu chạy trong Telegram)
-         * Trả về:
-         * - 'granted' nếu user cho phép
-         * - 'denied' nếu từ chối
-         * - 'unknown' nếu không chạy trong Telegram
-         */;
-        _proto.RequestMicPermissionTelegram = /*#__PURE__*/
-        function () {
-          var _RequestMicPermissionTelegram = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-            var _TelegramHandler$webA;
-            return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-              while (1) switch (_context2.prev = _context2.next) {
-                case 0:
-                  console.log('Telegram WebApp SDK version:', TelegramHandler.webApp != null ? (_TelegramHandler$webA = TelegramHandler.webApp) == null ? void 0 : _TelegramHandler$webA.version : 0);
-                  this.labelSDKVersion.string = 'Telegram WebApp SDK version:' + TelegramHandler.webApp != null ? TelegramHandler.webApp.version : 0;
-                  return _context2.abrupt("return", new Promise(function (resolve) {
-                    //const tg = (window as any).Telegram?.WebApp;
-                    var tg = TelegramHandler.webApp;
-                    if (!tg) {
-                      console.log('Telegram WebApp SDK not available, using browser permission.');
-                      resolve('unknown');
-                      return;
-                    }
-                    try {
-                      tg.ready();
-                      tg.requestPermission('microphone', function (status) {
-                        console.log('Telegram mic permission:', status);
-                        resolve(status);
-                      });
-                    } catch (e) {
-                      console.warn('Telegram mic permission error:', e);
-                      resolve('unknown');
-                    }
-                  }));
-                case 3:
-                case "end":
-                  return _context2.stop();
-              }
-            }, _callee2, this);
-          }));
-          function RequestMicPermissionTelegram() {
-            return _RequestMicPermissionTelegram.apply(this, arguments);
-          }
-          return RequestMicPermissionTelegram;
-        }();
         return Voiceinput;
       }(Component), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "btnVoiceInput", [_dec2], {
         configurable: true,
@@ -645,20 +553,6 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           return null;
         }
       }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "labelInform", [_dec4], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function initializer() {
-          return null;
-        }
-      }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, "labelDebug", [_dec5], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function initializer() {
-          return null;
-        }
-      }), _descriptor5 = _applyDecoratedDescriptor(_class2.prototype, "labelSDKVersion", [_dec6], {
         configurable: true,
         enumerable: true,
         writable: true,
