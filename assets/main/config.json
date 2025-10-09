@@ -30,13 +30,13 @@
         "fd8ec536-a354-4a17-9c74-4f3883c378c8"
     ],
     "paths": {
-        "7ccb9a79-7a2b-496d-b35e-65d4363997db": [
-            "db:/assets/Scenes/Init",
+        "3b9d4dd8-dd61-4f52-b3b1-6effe2a75d61": [
+            "db:/assets/Scenes/Game",
             "cc.SceneAsset",
             1
         ],
-        "3b9d4dd8-dd61-4f52-b3b1-6effe2a75d61": [
-            "db:/assets/Scenes/Game",
+        "7ccb9a79-7a2b-496d-b35e-65d4363997db": [
+            "db:/assets/Scenes/Init",
             "cc.SceneAsset",
             1
         ],
@@ -52,8 +52,8 @@
         ]
     },
     "scenes": {
-        "db://assets/Scenes/Init.scene": "7ccb9a79-7a2b-496d-b35e-65d4363997db",
-        "db://assets/Scenes/Game.scene": "3b9d4dd8-dd61-4f52-b3b1-6effe2a75d61"
+        "db://assets/Scenes/Game.scene": "3b9d4dd8-dd61-4f52-b3b1-6effe2a75d61",
+        "db://assets/Scenes/Init.scene": "7ccb9a79-7a2b-496d-b35e-65d4363997db"
     },
     "packs": {
         "07afc6510": [
