@@ -592,9 +592,11 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
         _proto.RequestMicPermissionTelegram = /*#__PURE__*/
         function () {
           var _RequestMicPermissionTelegram = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+            var _TelegramHandler$webA;
             return _regeneratorRuntime().wrap(function _callee2$(_context2) {
               while (1) switch (_context2.prev = _context2.next) {
                 case 0:
+                  console.log('Telegram WebApp SDK version:', (_TelegramHandler$webA = TelegramHandler.webApp) == null ? void 0 : _TelegramHandler$webA.version);
                   return _context2.abrupt("return", new Promise(function (resolve) {
                     //const tg = (window as any).Telegram?.WebApp;
                     var tg = TelegramHandler.webApp;
@@ -614,7 +616,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                       resolve('unknown');
                     }
                   }));
-                case 1:
+                case 2:
                 case "end":
                   return _context2.stop();
               }
