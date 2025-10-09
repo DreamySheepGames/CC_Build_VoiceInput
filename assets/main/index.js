@@ -389,20 +389,24 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
             return _regeneratorRuntime().wrap(function _callee$(_context) {
               while (1) switch (_context.prev = _context.next) {
                 case 0:
-                  try {
-                    // await this.LoadTelegramSDK();
-                    // this.ProcessInitData();
-                    this.LoadGameScene();
-                  } catch (error) {
-                    console.error('Failed to load Telegram SDK:', error);
-                    //this.LoadGameScene();
-                  }
-
-                case 1:
+                  _context.prev = 0;
+                  _context.next = 3;
+                  return this.LoadTelegramSDK();
+                case 3:
+                  this.ProcessInitData();
+                  this.LoadGameScene();
+                  _context.next = 10;
+                  break;
+                case 7:
+                  _context.prev = 7;
+                  _context.t0 = _context["catch"](0);
+                  console.error('Failed to load Telegram SDK:', _context.t0);
+                //this.LoadGameScene();
+                case 10:
                 case "end":
                   return _context.stop();
               }
-            }, _callee, this);
+            }, _callee, this, [[0, 7]]);
           }));
           function InitTelegram() {
             return _InitTelegram.apply(this, arguments);
