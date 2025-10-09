@@ -442,11 +442,11 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
       TelegramHandler = module.TelegramHandler;
     }],
     execute: function () {
-      var _dec, _dec2, _dec3, _dec4, _dec5, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
+      var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5;
       cclegacy._RF.push({}, "00d40Jp615IA5Hvg9OYjSmY", "Voiceinput", undefined);
       var ccclass = _decorator.ccclass,
         property = _decorator.property;
-      var Voiceinput = exports('Voiceinput', (_dec = ccclass('Voiceinput'), _dec2 = property(Button), _dec3 = property(EditBox), _dec4 = property(Label), _dec5 = property(Label), _dec(_class = (_class2 = /*#__PURE__*/function (_Component) {
+      var Voiceinput = exports('Voiceinput', (_dec = ccclass('Voiceinput'), _dec2 = property(Button), _dec3 = property(EditBox), _dec4 = property(Label), _dec5 = property(Label), _dec6 = property(Label), _dec(_class = (_class2 = /*#__PURE__*/function (_Component) {
         _inheritsLoose(Voiceinput, _Component);
         function Voiceinput() {
           var _this;
@@ -458,6 +458,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           _initializerDefineProperty(_this, "inputField", _descriptor2, _assertThisInitialized(_this));
           _initializerDefineProperty(_this, "labelInform", _descriptor3, _assertThisInitialized(_this));
           _initializerDefineProperty(_this, "labelDebug", _descriptor4, _assertThisInitialized(_this));
+          _initializerDefineProperty(_this, "labelSDKVersion", _descriptor5, _assertThisInitialized(_this));
           _this.isRecording = false;
           _this.recognition = null;
           return _this;
@@ -596,7 +597,8 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
             return _regeneratorRuntime().wrap(function _callee2$(_context2) {
               while (1) switch (_context2.prev = _context2.next) {
                 case 0:
-                  console.log('Telegram WebApp SDK version:', (_TelegramHandler$webA = TelegramHandler.webApp) == null ? void 0 : _TelegramHandler$webA.version);
+                  console.log('Telegram WebApp SDK version:', TelegramHandler.webApp != null ? (_TelegramHandler$webA = TelegramHandler.webApp) == null ? void 0 : _TelegramHandler$webA.version : 0);
+                  this.labelSDKVersion.string = 'Telegram WebApp SDK version:' + TelegramHandler.webApp != null ? TelegramHandler.webApp.version : 0;
                   return _context2.abrupt("return", new Promise(function (resolve) {
                     //const tg = (window as any).Telegram?.WebApp;
                     var tg = TelegramHandler.webApp;
@@ -616,11 +618,11 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                       resolve('unknown');
                     }
                   }));
-                case 2:
+                case 3:
                 case "end":
                   return _context2.stop();
               }
-            }, _callee2);
+            }, _callee2, this);
           }));
           function RequestMicPermissionTelegram() {
             return _RequestMicPermissionTelegram.apply(this, arguments);
@@ -650,6 +652,13 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           return null;
         }
       }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, "labelDebug", [_dec5], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function initializer() {
+          return null;
+        }
+      }), _descriptor5 = _applyDecoratedDescriptor(_class2.prototype, "labelSDKVersion", [_dec6], {
         configurable: true,
         enumerable: true,
         writable: true,
