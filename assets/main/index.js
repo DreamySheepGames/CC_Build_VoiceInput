@@ -460,19 +460,19 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
         }
         var _proto = Voiceinput.prototype;
         _proto.onLoad = /*#__PURE__*/function () {
-          var _onLoad = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+          var _onLoad = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
             var _this2 = this;
             var SpeechRecognition;
-            return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-              while (1) switch (_context2.prev = _context2.next) {
+            return _regeneratorRuntime().wrap(function _callee$(_context) {
+              while (1) switch (_context.prev = _context.next) {
                 case 0:
                   SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                   if (SpeechRecognition) {
-                    _context2.next = 4;
+                    _context.next = 4;
                     break;
                   }
                   console.error("SpeechRecognition not supported in this browser.");
-                  return _context2.abrupt("return");
+                  return _context.abrupt("return");
                 case 4:
                   this.recognition = new SpeechRecognition();
                   this.recognition.lang = 'en-US';
@@ -485,41 +485,31 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   this.recognition.onerror = function (err) {
                     console.error("Speech recognition error:", err);
                   };
-                  this.recognition.onend = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-                    var _this2$stream, track;
-                    return _regeneratorRuntime().wrap(function _callee$(_context) {
-                      while (1) switch (_context.prev = _context.next) {
-                        case 0:
-                          console.log("Speech recognition ended.");
-                          // nếu user vẫn đang "recording", thử restart bằng track (nếu hỗ trợ)
-                          if (_this2.isRecording) {
-                            try {
-                              track = (_this2$stream = _this2.stream) == null ? void 0 : _this2$stream.getAudioTracks()[0];
-                              if (track) {
-                                _this2.recognition.start(track);
-                              } else {
-                                _this2.recognition.start();
-                              }
-                            } catch (e) {
-                              console.warn("Restart with track failed, stopping:", e);
-                              _this2.isRecording = false;
-                              _this2.UpdateButtonState();
-                              _this2.labelInform.string = 'Speech ended, please record again!';
-                            }
-                          } else {
-                            _this2.UpdateButtonState();
+                  this.recognition.onend = function () {
+                    console.log("Speech recognition ended.");
+                    _this2.recognition._isRunning = false;
+
+                    // Nếu user vẫn đang recording, restart lại sau 1 chút delay
+                    if (_this2.isRecording) {
+                      setTimeout(function () {
+                        if (!_this2.recognition._isRunning && _this2.isRecording) {
+                          try {
+                            _this2.recognition._isRunning = true;
+                            _this2.recognition.start();
+                          } catch (err) {
+                            console.warn("Restart failed:", err);
                           }
-                        case 2:
-                        case "end":
-                          return _context.stop();
-                      }
-                    }, _callee);
-                  }));
+                        }
+                      }, 500); // delay nhẹ để WebView giải phóng session cũ
+                    } else {
+                      _this2.UpdateButtonState();
+                    }
+                  };
                 case 11:
                 case "end":
-                  return _context2.stop();
+                  return _context.stop();
               }
-            }, _callee2, this);
+            }, _callee, this);
           }));
           function onLoad() {
             return _onLoad.apply(this, arguments);
@@ -527,35 +517,35 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           return onLoad;
         }();
         _proto.ensureMic = /*#__PURE__*/function () {
-          var _ensureMic = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-            return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-              while (1) switch (_context3.prev = _context3.next) {
+          var _ensureMic = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+            return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+              while (1) switch (_context2.prev = _context2.next) {
                 case 0:
                   if (!this.stream) {
-                    _context3.next = 2;
+                    _context2.next = 2;
                     break;
                   }
-                  return _context3.abrupt("return");
+                  return _context2.abrupt("return");
                 case 2:
-                  _context3.prev = 2;
-                  _context3.next = 5;
+                  _context2.prev = 2;
+                  _context2.next = 5;
                   return navigator.mediaDevices.getUserMedia({
                     audio: true
                   });
                 case 5:
-                  this.stream = _context3.sent;
-                  _context3.next = 12;
+                  this.stream = _context2.sent;
+                  _context2.next = 12;
                   break;
                 case 8:
-                  _context3.prev = 8;
-                  _context3.t0 = _context3["catch"](2);
-                  console.error("getUserMedia failed:", _context3.t0);
-                  throw _context3.t0;
+                  _context2.prev = 8;
+                  _context2.t0 = _context2["catch"](2);
+                  console.error("getUserMedia failed:", _context2.t0);
+                  throw _context2.t0;
                 case 12:
                 case "end":
-                  return _context3.stop();
+                  return _context2.stop();
               }
-            }, _callee3, this, [[2, 8]]);
+            }, _callee2, this, [[2, 8]]);
           }));
           function ensureMic() {
             return _ensureMic.apply(this, arguments);
@@ -569,49 +559,61 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           this.UpdateButtonState();
         };
         _proto.OnVoiceButtonPressed = /*#__PURE__*/function () {
-          var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-            var _this$stream, track;
-            return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-              while (1) switch (_context4.prev = _context4.next) {
+          var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+            return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+              while (1) switch (_context3.prev = _context3.next) {
                 case 0:
                   if (this.isRecording) {
-                    _context4.next = 18;
+                    _context3.next = 23;
                     break;
                   }
+                  console.log('Start speech recognition...');
                   this.labelInform.string = 'Recording...';
                   this.isRecording = true;
                   this.UpdateButtonState();
-                  _context4.prev = 4;
-                  _context4.next = 7;
+                  _context3.prev = 5;
+                  _context3.next = 8;
                   return this.ensureMic();
-                case 7:
-                  track = (_this$stream = this.stream) == null ? void 0 : _this$stream.getAudioTracks()[0];
-                  try {
-                    if (track) this.recognition.start(track);else this.recognition.start();
-                  } catch (err) {
-                    console.warn('start(track) not supported, falling back to start():', err);
-                    this.recognition.start();
+                case 8:
+                  if (!this.recognition._isRunning) {
+                    _context3.next = 11;
+                    break;
                   }
-                  _context4.next = 16;
-                  break;
+                  console.warn('Recognition is already running, skip start.');
+                  return _context3.abrupt("return");
                 case 11:
-                  _context4.prev = 11;
-                  _context4.t0 = _context4["catch"](4);
-                  this.isRecording = false;
-                  this.UpdateButtonState();
-                  this.labelInform.string = 'Microphone permission denied / unavailable';
-                case 16:
-                  _context4.next = 21;
+                  this.recognition._isRunning = true;
+                  this.recognition.start();
+                  _context3.next = 21;
                   break;
-                case 18:
+                case 15:
+                  _context3.prev = 15;
+                  _context3.t0 = _context3["catch"](5);
+                  console.error("Error starting speech recognition:", _context3.t0);
                   this.isRecording = false;
                   this.UpdateButtonState();
-                  this.recognition.stop();
+                  this.labelInform.string = 'Speech recognition failed to start.';
                 case 21:
+                  _context3.next = 28;
+                  break;
+                case 23:
+                  console.log('Stop speech recognition.');
+                  this.labelInform.string = 'Speech recognition stopped!';
+                  this.isRecording = false;
+                  this.UpdateButtonState();
+                  if (this.recognition._isRunning) {
+                    try {
+                      this.recognition._isRunning = false;
+                      this.recognition.abort(); // dùng abort thay vì stop
+                    } catch (e) {
+                      console.warn("abort() failed:", e);
+                    }
+                  }
+                case 28:
                 case "end":
-                  return _context4.stop();
+                  return _context3.stop();
               }
-            }, _callee4, this, [[4, 11]]);
+            }, _callee3, this, [[5, 15]]);
           }));
           function OnVoiceButtonPressed() {
             return _OnVoiceButtonPressed.apply(this, arguments);
