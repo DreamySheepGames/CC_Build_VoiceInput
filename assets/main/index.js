@@ -622,14 +622,6 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   _context3.t0 = _context3["catch"](3);
                   console.warn('start(track) not supported, falling back:', _context3.t0);
                 case 12:
-                  // fallback sang start()
-                  try {
-                    this.recognition.start();
-                    console.log('Started recognition (fallback start())');
-                  } catch (err) {
-                    console.error('recognition.start() failed:', err);
-                  }
-                case 13:
                 case "end":
                   return _context3.stop();
               }
