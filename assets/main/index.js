@@ -593,8 +593,9 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
               while (1) switch (_context2.prev = _context2.next) {
                 case 0:
                   return _context2.abrupt("return", new Promise(function (resolve) {
-                    var _Telegram;
-                    var tg = (_Telegram = window.Telegram) == null ? void 0 : _Telegram.WebApp;
+                    var _window$Telegram;
+                    //const tg = (window as any).Telegram?.WebApp;
+                    var tg = (_window$Telegram = window['Telegram']) == null ? void 0 : _window$Telegram.WebApp;
                     if (!tg || !tg.requestPermission) {
                       console.log('Telegram WebApp SDK not available, using browser permission.');
                       resolve('unknown');
