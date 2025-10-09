@@ -389,23 +389,20 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
             return _regeneratorRuntime().wrap(function _callee$(_context) {
               while (1) switch (_context.prev = _context.next) {
                 case 0:
-                  _context.prev = 0;
-                  _context.next = 3;
-                  return this.LoadTelegramSDK();
-                case 3:
-                  this.ProcessInitData();
-                  this.LoadGameScene();
-                  _context.next = 10;
-                  break;
-                case 7:
-                  _context.prev = 7;
-                  _context.t0 = _context["catch"](0);
-                  console.error('Failed to load Telegram SDK:', _context.t0);
-                case 10:
+                  try {
+                    // await this.LoadTelegramSDK();
+                    // this.ProcessInitData();
+                    this.LoadGameScene();
+                  } catch (error) {
+                    console.error('Failed to load Telegram SDK:', error);
+                    //this.LoadGameScene();
+                  }
+
+                case 1:
                 case "end":
                   return _context.stop();
               }
-            }, _callee, this, [[0, 7]]);
+            }, _callee, this);
           }));
           function InitTelegram() {
             return _InitTelegram.apply(this, arguments);
@@ -455,103 +452,40 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           _initializerDefineProperty(_this, "labelInform", _descriptor3, _assertThisInitialized(_this));
           _this.isRecording = false;
           _this.recognition = void 0;
-          _this.stream = null;
           return _this;
         }
         var _proto = Voiceinput.prototype;
-        _proto.onLoad = /*#__PURE__*/function () {
-          var _onLoad = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-            var _this2 = this;
-            var SpeechRecognition;
-            return _regeneratorRuntime().wrap(function _callee$(_context) {
-              while (1) switch (_context.prev = _context.next) {
-                case 0:
-                  SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                  if (SpeechRecognition) {
-                    _context.next = 4;
-                    break;
-                  }
-                  console.error("SpeechRecognition not supported in this browser.");
-                  return _context.abrupt("return");
-                case 4:
-                  this.recognition = new SpeechRecognition();
-                  this.recognition.lang = 'en-US';
-                  this.recognition.continuous = true;
-                  this.recognition.interimResults = false;
-                  this.recognition.onresult = function (event) {
-                    var transcript = event.results[event.resultIndex][0].transcript;
-                    if (_this2.inputField) _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
-                  };
-                  this.recognition.onerror = function (err) {
-                    console.error("Speech recognition error:", err);
-                  };
-                  this.recognition.onend = function () {
-                    console.log("Speech recognition ended.");
-                    _this2.recognition._isRunning = false;
+        _proto.onLoad = function onLoad() {
+          var _this2 = this;
+          var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SpeechRecognition) {
+            console.error("SpeechRecognition not supported in this browser.");
+            return;
+          }
+          this.recognition = new SpeechRecognition();
+          this.recognition.lang = 'en-US';
+          this.recognition.continuous = true;
+          this.recognition.interimResults = false;
+          this.recognition.onresult = function (event) {
+            var transcript = event.results[event.resultIndex][0].transcript;
+            console.log("Recognized:", transcript);
+            if (_this2.inputField) {
+              _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
+            }
+          };
+          this.recognition.onerror = function (err) {
+            console.error("Speech recognition error:", err);
+          };
+          this.recognition.onend = function () {
+            _this2.isRecording = false;
+            _this2.UpdateButtonState();
+            console.log("Speech recognition ended.");
+            // if (this.isRecording) {
+            //     this.recognition.start(); // auto restart if still recording
+            // }
+          };
+        };
 
-                    // Nếu user vẫn đang recording, restart lại sau 1 chút delay
-                    if (_this2.isRecording) {
-                      setTimeout(function () {
-                        if (!_this2.recognition._isRunning && _this2.isRecording) {
-                          try {
-                            _this2.recognition._isRunning = true;
-                            _this2.recognition.start();
-                          } catch (err) {
-                            console.warn("Restart failed:", err);
-                          }
-                        }
-                      }, 500); // delay nhẹ để WebView giải phóng session cũ
-                    } else {
-                      _this2.UpdateButtonState();
-                    }
-                  };
-                case 11:
-                case "end":
-                  return _context.stop();
-              }
-            }, _callee, this);
-          }));
-          function onLoad() {
-            return _onLoad.apply(this, arguments);
-          }
-          return onLoad;
-        }();
-        _proto.ensureMic = /*#__PURE__*/function () {
-          var _ensureMic = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-            return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-              while (1) switch (_context2.prev = _context2.next) {
-                case 0:
-                  if (!this.stream) {
-                    _context2.next = 2;
-                    break;
-                  }
-                  return _context2.abrupt("return");
-                case 2:
-                  _context2.prev = 2;
-                  _context2.next = 5;
-                  return navigator.mediaDevices.getUserMedia({
-                    audio: true
-                  });
-                case 5:
-                  this.stream = _context2.sent;
-                  _context2.next = 12;
-                  break;
-                case 8:
-                  _context2.prev = 8;
-                  _context2.t0 = _context2["catch"](2);
-                  console.error("getUserMedia failed:", _context2.t0);
-                  throw _context2.t0;
-                case 12:
-                case "end":
-                  return _context2.stop();
-              }
-            }, _callee2, this, [[2, 8]]);
-          }));
-          function ensureMic() {
-            return _ensureMic.apply(this, arguments);
-          }
-          return ensureMic;
-        }();
         _proto.start = function start() {
           if (this.btnVoiceInput) {
             this.btnVoiceInput.node.on(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
@@ -559,61 +493,28 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           this.UpdateButtonState();
         };
         _proto.OnVoiceButtonPressed = /*#__PURE__*/function () {
-          var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-            return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-              while (1) switch (_context3.prev = _context3.next) {
+          var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+            return _regeneratorRuntime().wrap(function _callee$(_context) {
+              while (1) switch (_context.prev = _context.next) {
                 case 0:
-                  if (this.isRecording) {
-                    _context3.next = 23;
-                    break;
+                  if (!this.isRecording) {
+                    console.log('Start speech recognition...');
+                    this.labelInform.string = 'Recording...';
+                    this.isRecording = true;
+                    this.UpdateButtonState();
+                    this.recognition.start();
+                  } else {
+                    console.log('Stop speech recognition.');
+                    this.labelInform.string = 'Speech recognition stopped!';
+                    this.isRecording = false;
+                    this.UpdateButtonState();
+                    this.recognition.stop();
                   }
-                  console.log('Start speech recognition...');
-                  this.labelInform.string = 'Recording...';
-                  this.isRecording = true;
-                  this.UpdateButtonState();
-                  _context3.prev = 5;
-                  _context3.next = 8;
-                  return this.ensureMic();
-                case 8:
-                  if (!this.recognition._isRunning) {
-                    _context3.next = 11;
-                    break;
-                  }
-                  console.warn('Recognition is already running, skip start.');
-                  return _context3.abrupt("return");
-                case 11:
-                  this.recognition._isRunning = true;
-                  this.recognition.start();
-                  _context3.next = 21;
-                  break;
-                case 15:
-                  _context3.prev = 15;
-                  _context3.t0 = _context3["catch"](5);
-                  console.error("Error starting speech recognition:", _context3.t0);
-                  this.isRecording = false;
-                  this.UpdateButtonState();
-                  this.labelInform.string = 'Speech recognition failed to start.';
-                case 21:
-                  _context3.next = 28;
-                  break;
-                case 23:
-                  console.log('Stop speech recognition.');
-                  this.labelInform.string = 'Speech recognition stopped!';
-                  this.isRecording = false;
-                  this.UpdateButtonState();
-                  if (this.recognition._isRunning) {
-                    try {
-                      this.recognition._isRunning = false;
-                      this.recognition.abort(); // dùng abort thay vì stop
-                    } catch (e) {
-                      console.warn("abort() failed:", e);
-                    }
-                  }
-                case 28:
+                case 1:
                 case "end":
-                  return _context3.stop();
+                  return _context.stop();
               }
-            }, _callee3, this, [[5, 15]]);
+            }, _callee, this);
           }));
           function OnVoiceButtonPressed() {
             return _OnVoiceButtonPressed.apply(this, arguments);
