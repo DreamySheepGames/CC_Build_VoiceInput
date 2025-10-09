@@ -458,6 +458,35 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           return _this;
         }
         var _proto = Voiceinput.prototype;
+        _proto.onLoad = function onLoad() {
+          var _this2 = this;
+          var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SpeechRecognition) {
+            console.error("SpeechRecognition not supported in this browser.");
+            return;
+          }
+          this.recognition = new SpeechRecognition();
+          this.recognition.lang = 'en-US';
+          this.recognition.continuous = true;
+          this.recognition.interimResults = false;
+          this.recognition.onresult = function (event) {
+            var transcript = event.results[event.resultIndex][0].transcript;
+            console.log("Recognized:", transcript);
+            if (_this2.inputField) {
+              _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
+            }
+          };
+          this.recognition.onerror = function (err) {
+            console.error("Speech recognition error:", err);
+          };
+          this.recognition.onend = function () {
+            console.log("Speech recognition ended.");
+            if (_this2.isRecording) {
+              _this2.recognition.start(); // auto restart if still recording
+            }
+          };
+        };
+
         _proto.start = function start() {
           if (this.btnVoiceInput) {
             this.btnVoiceInput.node.on(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
@@ -466,86 +495,23 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
         };
         _proto.OnVoiceButtonPressed = /*#__PURE__*/function () {
           var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-            var _this2 = this;
-            var SpeechRecognition;
             return _regeneratorRuntime().wrap(function _callee$(_context) {
               while (1) switch (_context.prev = _context.next) {
                 case 0:
-                  if (this.isRecording) {
-                    _context.next = 21;
-                    break;
-                  }
-                  console.log('Start speech recognition...');
-                  this.labelInform.string = 'Start speech recognition...';
-                  this.isRecording = true;
-                  this.UpdateButtonState();
-
-                  // init speech recognition
-                  SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                  if (SpeechRecognition) {
-                    _context.next = 10;
-                    break;
-                  }
-                  console.error("SpeechRecognition not supported in this browser.");
-                  this.labelInform.string = 'SpeechRecognition not supported in this browser.';
-                  return _context.abrupt("return");
-                case 10:
-                  this.labelInform.string = 'Recording...';
-                  // setup recognition
-                  this.recognition = new SpeechRecognition();
-                  this.recognition.lang = 'en-US';
-                  this.recognition.continuous = true;
-                  this.recognition.interimResults = false;
-                  this.recognition.onresult = function (event) {
-                    var transcript = event.results[event.resultIndex][0].transcript;
-                    console.log("Recognized:", transcript);
-
-                    // add text into input field
-                    if (_this2.inputField) {
-                      _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
-
-                      // Auto-scroll to bottom
-                      _this2.scheduleOnce(function () {
-                        var editBoxImpl = _this2.inputField._impl;
-                        if (editBoxImpl && editBoxImpl._inputEl) {
-                          var inputEl = editBoxImpl._inputEl;
-                          inputEl.scrollTop = inputEl.scrollHeight;
-                          inputEl.scrollLeft = inputEl.scrollWidth;
-                        }
-                      }, 5 / 60); // about 5 frame if 60fps
-
-                      // auto start new regcognition session
-                      //this.recognition.start();
-                      _this2.labelInform.string = 'Recording...';
-                    }
-                  };
-                  this.recognition.onerror = function (err) {
-                    console.error("Speech recognition error:", err);
-                  };
-                  this.recognition.onend = function () {
-                    console.log("Speech recognition ended.");
-                    if (_this2.isRecording) {
-                      _this2.isRecording = false;
-                      _this2.UpdateButtonState();
-                      _this2.labelInform.string = "Speech ended, please record again!";
-                      // this.recognition.start();
-                      // this.labelInform.string = 'Recording...';
-                    }
-                  };
-
-                  this.recognition.start();
-                  _context.next = 26;
-                  break;
-                case 21:
-                  console.log('Stop speech recognition.');
-                  this.labelInform.string = 'speech recognition stopped!';
-                  this.isRecording = false;
-                  this.UpdateButtonState();
-                  if (this.recognition) {
+                  if (!this.isRecording) {
+                    console.log('Start speech recognition...');
+                    this.labelInform.string = 'Recording...';
+                    this.isRecording = true;
+                    this.UpdateButtonState();
+                    this.recognition.start();
+                  } else {
+                    console.log('Stop speech recognition.');
+                    this.labelInform.string = 'Speech recognition stopped!';
+                    this.isRecording = false;
+                    this.UpdateButtonState();
                     this.recognition.stop();
-                    this.recognition = null;
                   }
-                case 26:
+                case 1:
                 case "end":
                   return _context.stop();
               }
