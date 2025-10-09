@@ -458,35 +458,76 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           return _this;
         }
         var _proto = Voiceinput.prototype;
-        _proto.onLoad = function onLoad() {
-          var _this2 = this;
-          var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-          if (!SpeechRecognition) {
-            console.error("SpeechRecognition not supported in this browser.");
-            return;
-          }
-          this.recognition = new SpeechRecognition();
-          this.recognition.lang = 'en-US';
-          this.recognition.continuous = true;
-          this.recognition.interimResults = false;
-          this.recognition.onresult = function (event) {
-            var transcript = event.results[event.resultIndex][0].transcript;
-            console.log("Recognized:", transcript);
-            if (_this2.inputField) {
-              _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
-            }
-          };
-          this.recognition.onerror = function (err) {
-            console.error("Speech recognition error:", err);
-          };
-          this.recognition.onend = function () {
-            console.log("Speech recognition ended.");
-            if (_this2.isRecording) {
-              _this2.recognition.start(); // auto restart if still recording
-            }
-          };
-        };
+        _proto.onLoad = /*#__PURE__*/function () {
+          var _onLoad = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+            var _this2 = this;
+            var stream, SpeechRecognition;
+            return _regeneratorRuntime().wrap(function _callee$(_context) {
+              while (1) switch (_context.prev = _context.next) {
+                case 0:
+                  _context.prev = 0;
+                  _context.next = 3;
+                  return navigator.mediaDevices.getUserMedia({
+                    audio: true
+                  });
+                case 3:
+                  stream = _context.sent;
+                  console.log("Microphone permission granted.");
+                  // Immediately stop stream so mic isn’t used constantly
+                  stream.getTracks().forEach(function (track) {
+                    return track.stop();
+                  });
+                  _context.next = 13;
+                  break;
+                case 8:
+                  _context.prev = 8;
+                  _context.t0 = _context["catch"](0);
+                  console.error("Microphone permission denied or not available:", _context.t0);
+                  this.labelInform.string = "Please allow microphone access.";
+                  return _context.abrupt("return");
+                case 13:
+                  SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                  if (SpeechRecognition) {
+                    _context.next = 17;
+                    break;
+                  }
+                  console.error("SpeechRecognition not supported in this browser.");
+                  return _context.abrupt("return");
+                case 17:
+                  this.recognition = new SpeechRecognition();
+                  this.recognition.lang = 'en-US';
+                  this.recognition.continuous = true;
+                  this.recognition.interimResults = false;
+                  this.recognition.onresult = function (event) {
+                    var transcript = event.results[event.resultIndex][0].transcript;
+                    console.log("Recognized:", transcript);
+                    if (_this2.inputField) {
+                      _this2.inputField.string += (_this2.inputField.string ? ' ' : '') + transcript;
+                    }
+                  };
+                  this.recognition.onerror = function (err) {
+                    console.error("Speech recognition error:", err);
+                  };
+                  this.recognition.onend = function () {
+                    _this2.isRecording = false;
+                    _this2.UpdateButtonState();
+                    console.log("Speech recognition ended.");
+                    // if (this.isRecording) {
+                    //     this.recognition.start(); // auto restart if still recording
+                    // }
+                  };
 
+                case 24:
+                case "end":
+                  return _context.stop();
+              }
+            }, _callee, this, [[0, 8]]);
+          }));
+          function onLoad() {
+            return _onLoad.apply(this, arguments);
+          }
+          return onLoad;
+        }();
         _proto.start = function start() {
           if (this.btnVoiceInput) {
             this.btnVoiceInput.node.on(Button.EventType.CLICK, this.OnVoiceButtonPressed, this);
@@ -494,9 +535,9 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
           this.UpdateButtonState();
         };
         _proto.OnVoiceButtonPressed = /*#__PURE__*/function () {
-          var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-            return _regeneratorRuntime().wrap(function _callee$(_context) {
-              while (1) switch (_context.prev = _context.next) {
+          var _OnVoiceButtonPressed = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+            return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+              while (1) switch (_context2.prev = _context2.next) {
                 case 0:
                   if (!this.isRecording) {
                     console.log('Start speech recognition...');
@@ -513,9 +554,9 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
                   }
                 case 1:
                 case "end":
-                  return _context.stop();
+                  return _context2.stop();
               }
-            }, _callee, this);
+            }, _callee2, this);
           }));
           function OnVoiceButtonPressed() {
             return _OnVoiceButtonPressed.apply(this, arguments);
