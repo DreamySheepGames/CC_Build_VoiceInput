@@ -343,8 +343,9 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
           });
         };
         _proto.ProcessInitData = function ProcessInitData() {
-          var _window$Telegram;
+          var _window$Telegram, _window$Telegram2;
           var initData = (_window$Telegram = window['Telegram']) == null || (_window$Telegram = _window$Telegram.WebApp) == null ? void 0 : _window$Telegram.initData;
+          TelegramHandler.webApp = (_window$Telegram2 = window['Telegram']) == null ? void 0 : _window$Telegram2.WebApp;
 
           //console.log('window.WebApp.initDataUnsafe: ', window['Telegram'].WebApp.initDataUnsafe);
           if (initData) {
@@ -414,14 +415,14 @@ System.register("chunks:///_virtual/TelegramHandler.ts", ['./rollupPluginModLoBa
           return InitTelegram;
         }();
         return TelegramHandler;
-      }(Component), _class2.instance = null, _class2.telegramInitData = '', _class2.telegramQueryId = '', _class2)) || _class));
+      }(Component), _class2.instance = null, _class2.telegramInitData = '', _class2.telegramQueryId = '', _class2.webApp = null, _class2)) || _class));
       cclegacy._RF.pop();
     }
   };
 });
 
-System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc'], function (exports) {
-  var _applyDecoratedDescriptor, _inheritsLoose, _initializerDefineProperty, _assertThisInitialized, _asyncToGenerator, _regeneratorRuntime, cclegacy, _decorator, Button, EditBox, Label, Component;
+System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './TelegramHandler.ts'], function (exports) {
+  var _applyDecoratedDescriptor, _inheritsLoose, _initializerDefineProperty, _assertThisInitialized, _asyncToGenerator, _regeneratorRuntime, cclegacy, _decorator, Button, EditBox, Label, Component, TelegramHandler;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -437,6 +438,8 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
       EditBox = module.EditBox;
       Label = module.Label;
       Component = module.Component;
+    }, function (module) {
+      TelegramHandler = module.TelegramHandler;
     }],
     execute: function () {
       var _dec, _dec2, _dec3, _dec4, _dec5, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
@@ -593,10 +596,9 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
               while (1) switch (_context2.prev = _context2.next) {
                 case 0:
                   return _context2.abrupt("return", new Promise(function (resolve) {
-                    var _window$Telegram;
                     //const tg = (window as any).Telegram?.WebApp;
-                    var tg = (_window$Telegram = window['Telegram']) == null ? void 0 : _window$Telegram.WebApp;
-                    if (!tg || !tg.requestPermission) {
+                    var tg = TelegramHandler.webApp;
+                    if (!tg) {
                       console.log('Telegram WebApp SDK not available, using browser permission.');
                       resolve('unknown');
                       return;
