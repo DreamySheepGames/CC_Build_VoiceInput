@@ -458,6 +458,7 @@ System.register("chunks:///_virtual/Voiceinput.ts", ['./rollupPluginModLoBabelHe
         var _proto = Voiceinput.prototype;
         _proto.onLoad = function onLoad() {
           var _this2 = this;
+          this.PermissionCheck();
           var SpeechRecognition = window.webkitSpeechRecognition;
           if (!SpeechRecognition) {
             console.error("SpeechRecognition not supported in this browser.");
